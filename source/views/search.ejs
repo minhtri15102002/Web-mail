@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdn.tiny.cloud/1/4lb731z2dfw15m1oaipj6yvcaf47ygrtqs5dlustsxkrt9u1/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<head>
+    <title>Gmail Web App</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Poppins:wght@400;500;600&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('http://localhost:9090/backgroud.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+        
+        .activate {
+            display: flex;
+            align-items: center;
+        }
+        
+        .activate button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .account {
+            display: flex;
+            align-items: center;
+        }
+        
+        .account img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .account span {
+            font-size: 14px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .logo img {
+            width: auto;
+            height: 120px;
+            margin-left: 30px;
+        }
+        
+        header {
+            background-color: #fff;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px #ccc;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 12%;
+            z-index: 1;
+        }
+        
+        .toolbar {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #888;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 10px;
+            margin-top: 25px;
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 200px;
+            height: calc(100% - 70px);
+            box-shadow: 2px 0 5px #ccc;
+            z-index: 1;
+        }
+        
+        .email-list {
+            margin-top: 94px;
+            margin-left: 205px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px #ccc;
+            position: relative;
+            height: 650px;
+            overflow: auto;
+        }
+        
+        .toolbar-menu button {
+            margin-left: 10px;
+        }
+        
+        .toolbar-menu .tool-items i {
+            margin-right: 10px;
+        }
+        
+        .toolbar ul {
+            list-style: none;
+            margin-left: 10px;
+            justify-content: center;
+            padding: 0;
+        }
+        
+        .toolbar li {
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .toolbar li.active {
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .toolbar li:hover {
+            color: #333;
+        }
+        
+        .toolbar a {
+            color: black;
+        }
+        
+        .email-list ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .email-list li {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            cursor: pointer;
+        }
+        
+        .email-list li:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .email-list li .checkbox {
+            margin-right: 10px;
+        }
+        
+        .email-list li .sender {
+            flex: 1;
+            margin-right: 10px;
+            font-weight: bold;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        
+        .email-list li .subject {
+            flex: 3;
+            margin-right: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        
+        .email-list li .date {
+            flex: 1;
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .email-view {
+            max-width: 1000px;
+            margin: 80px auto 0 220px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px #ccc;
+            border-radius: 5px;
+        }
+        
+        .email-view h2 {
+            margin-bottom: 10px;
+        }
+        
+        .email-view .details {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .email-view .details .sender {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .email-view .details .date {
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .email-view p {
+            line-height: 1.5;
+        }
+        
+        .status-inf {
+            margin-left: auto;
+            margin-right: 20px;
+            border: 1px solid #ccc;
+            border-radius: 999px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        
+        .status-inf span {
+            margin-left: 10px;
+        }
+        
+        .avatar-inf {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 999px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        
+        .dropdown .icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            margin-right: 5px;
+            background-color: #ec407a;
+            border-radius: 50%;
+            font-size: 25px;
+            color: #fff;
+        }
+        
+        .compose {
+            width: fit-content;
+            padding: 20px;
+            border-radius: 10px;
+            border: 0;
+            background-color: #c2e7ff;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        
+        .compose:hover {
+            box-shadow: 0 0 5px 5px #ccc;
+        }
+        
+        .compose i {
+            margin-right: 10px;
+        }
+        
+        .search-btn {
+            min-width: 100px;
+            padding: 10px;
+            border: 0;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #c2e7ff;
+        }
+        
+        .toolbar-menu {
+            background: white;
+        }
+        
+        .toolbar-menu .tool-items {
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .toolbar-menu .tool-items li {
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .toolbar-menu .tool-items i {
+            margin-right: 10px;
+        }
+        
+        .toolbar-menu .tool-items span {
+            margin-left: 10px;
+        }
+        
+        .icon .avatar-preview {
+            display: inline-block;
+            width: 50px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        
+        .icon .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        /* Modal meta-data */
+        
+        .email-item {
+            position: relative;
+        }
+        
+        .email-item input[type='checkbox']:hover {
+            box-shadow: 0 0 5px 5px #ccc;
+            cursor: pointer;
+        }
+        
+        .email-item:hover>span {
+            pointer-events: none;
+        }
+        
+        .email-meta {
+            display: none;
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            width: 300px;
+            height: 200px;
+            background-color: white;
+            z-index: 1;
+        }
+        
+        .email-item:hover .email-meta {
+            display: block;
+        }
+        
+        .compose-mail {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 800px;
+            height: 600px;
+            background-color: #fff;
+            box-shadow: 0 0 5px 5px #ccc;
+            border-radius: 10px;
+        }
+        
+        .mail-header {
+            display: flex;
+            padding: 10px 10px 0 10px;
+            background-color: #eee;
+            border-top-left-radius: 10px;
+        }
+        
+        .mail-header .control-btn {
+            margin-left: auto;
+            cursor: pointer;
+        }
+        
+        .mail-header i {
+            padding: 5px;
+            font-size: 14px;
+        }
+        
+        .mail-body {
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+            margin: 0 10px;
+        }
+        
+        .mail-body input {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            width: 100%;
+        }
+        
+        .mail-body .receiver,
+        .mail-body .cc,
+        .mail-body .bcc,
+        .mail-body .subject-mail {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mail-body span.before-input {
+            min-width: 55px;
+        }
+        
+        #cc-btn:hover,
+        #bcc-btn:hover {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        #inbox {
+            background: #ccc;
+        }
+        
+        .tool-items .number-of-mail {
+            margin-left: auto;
+            border-radius: 50%;
+            padding: 5px;
+            font-weight: bold;
+            font-size: 10px;
+        }
+        
+        .toolbar .active-page {
+            background-color: #ccc;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        
+        #send-mail {
+            width: 200px;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 999px;
+            border: 0;
+            background-color: blue;
+            color: #fff;
+            font-weight: bold;
+        }
+        /* If mail is not read (used in inbox)*/
+        
+        .email-unread {
+            font-weight: bold;
+            color: #333;
+            background-color: #ddd;
+        }
+        /*search-bar*/
+        
+        .search-bar {
+            display: flex;
+            align-items: center;
+            margin-left: 60px;
+            position: relative;
+        }
+        
+        .search-input-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .search-input-container input[type="text"] {
+            width: 100%;
+            padding: 10px 450px 10px 10px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 10px;
+            background-color: #f2f2f2;
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box;
+        }
+        
+        .search-input-container button {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            border: none;
+            background-color: transparent;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .advanced-search-btn {
+            min-width: 100px;
+            padding: 10px;
+            border: 0;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #c2e7ff;
+        }
+        
+        .advanced-search-input {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 79%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            font-size: 16px;
+            color: #333;
+            z-index: 999;
+        }
+        
+        .advanced-search-input label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .advanced-search-input input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: #f2f2f2;
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box;
+            justify-content: center;
+        }
+        
+        .advanced-search-input select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: #f2f2f2;
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box;
+            justify-content: center;
+        }
+        
+        #starred-mail {
+            margin-right: 10px;
+        }
+        
+        span .sender {
+            min-width: 400px;
+        }
+        /* Modal meta */
+        
+        .email-meta {
+            display: none;
+            position: absolute;
+            top: 40px;
+            left: 80px;
+            width: 300px;
+            height: 150px;
+            font-size: 14px;
+            background-color: #acd0f4;
+            border-radius: 0 10px;
+            z-index: 999;
+            opacity: 50%;
+        }
+        
+        .email-item:hover .email-meta {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            transition: opacity 1s;
+        }
+        
+        .email-meta .avatar-info-meta {
+            padding: 10px;
+            display: flex;
+            flex: 5;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .email-meta .avatar-info-meta .avatar-meta img {
+            flex: 1;
+            display: flex;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        
+        .email-meta .avatar-info-meta .sender-inf {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            margin-left: 10px;
+        }
+        
+        .email-meta .tool-meta {
+            flex: 1;
+            margin: 5px;
+            border-top: 1px solid #fff;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        
+        .email-meta .tool-meta i {
+            margin-left: 10px;
+            margin-top: 5px;
+        }
+        
+        .email-meta .tool-meta i:hover {
+            text-shadow: 0 0 10px #fff;
+        }
+        
+        .email-meta .tool-meta .email-detail-meta {
+            width: 200px;
+            margin-right: auto;
+            border: 0;
+            padding: 2px;
+            margin-top: 5px;
+            border-radius: 10px;
+        }
+        
+        .email-meta .tool-meta .email-detail-meta:hover {
+            box-shadow: 0 0 2px 2px #ddd;
+        }
+        
+        .labels {
+            font-weight: lighter;
+        }
+        
+        .labels i {
+            float: right;
+            margin-left: 5%;
+        }
+        
+        #labels-list li {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .label-name {
+            font-size: 80%;
+            color: #202124;
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 5px;
+        }
+        
+        .label-name i {
+            float: left;
+            margin-right: 2px;
+        }
+        
+        .label-menu {
+            cursor: pointer;
+            margin-left: 8px;
+            position: relative;
+        }
+        
+        .label-menu i {
+            color: #999;
+        }
+        
+        .menu-options {
+            position: absolute;
+            width: 80px;
+            top: 100%;
+            right: 0;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            display: none;
+        }
+        
+        .menu-item {
+            list-style-type: none;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 70%;
+            display: block;
+        }
+        
+        .menu-item:hover {
+            background-color: #f2f2f2;
+        }
+        
+        #add-label-popup {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        
+        #add-label-popup form {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            max-width: 300px;
+        }
+        
+        #add-label-popup button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        
+        #add-label-popup button:hover {
+            opacity: 0.8;
+        }
+        
+        #add-label-popup input[type="text"] {
+            padding: 5px;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        .email-context-menu {
+            position: absolute;
+            display: none;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+        }
+        
+        .email-context-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .email-context-menu li {
+            padding: 8px;
+            cursor: pointer;
+        }
+        
+        .email-context-menu li:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .label-popup {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+        }
+        
+        .label-popup ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .label-popup li {
+            padding: 8px;
+            cursor: pointer;
+            list-style: none;
+        }
+        
+        .label-popup li i {
+            margin-right: 8px;
+        }
+        
+        .label-popup li:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .fa-solid.fa-star {
+            color: gold;
+        }
+        
+        .fa-solid.fa-gauge {
+            margin-left: 20px;
+            font-size: 20px;
+            margin-top: 250px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <a href="http://localhost:9090/">
+
+                <img src="http://localhost:9090/logo.png">
+            </a>
+        </div>
+        <div class="search-bar">
+            <div class="search-input-container">
+                <input type="text" id="search-input" placeholder="Search...">
+                <button id="search-btn" class="search-btn"><i class="fa fa-search"></i></button>
+            </div>
+            <button id="advanced-search-btn" class="advanced-search-btn">Advanced Search</button>
+            <div id="advanced-search-input" class="advanced-search-input">
+                <div class="form-group">
+                    <label for="from-input">From:</label>
+                    <input type="text" id="from-input" name="from">
+                </div>
+                <div class="form-group">
+                    <label for="to-input">To:</label>
+                    <input type="text" id="to-input" name="to">
+                </div>
+                <div class="form-group">
+                    <label for="subject-input">Subject:</label>
+                    <input type="text" id="subject-input" name="subject">
+                </div>
+                <div class="form-group">
+                    <label for="date-within-input">Date within:</label>
+                    <select id="date-within-input" name="date-within">
+                        <option value="1d">1 day</option>
+                        <option value="1w">1 week</option>
+                        <option value="1m">1 month</option>
+                        <option value="3m">3 months</option>
+                        <option value="6m">6 months</option>
+                        <option value="1y">1 year</option>
+                    </select>
+                </div>
+                <button class='advanced-search-input-btn' type="submit">Search</button>
+            </div>
+        </div>
+
+
+        <div class="status-inf">
+            <i class="fa fa-solid fa-circle" style="color: green;"></i>
+            <span class="status">Active</span>
+        </div>
+
+        <div class="dropdown text-right">
+            <div class="avatar-inf dropdown-toggle text-primary" data-toggle="dropdown" data="<%= user.Email %>">
+                <span class="icon">
+                    <div class="avatar-preview">
+                        <% if (!user.avatar) { %>
+                            <img id="avatar-img" src="https://via.placeholder.com/100" alt="Avatar">
+                            <% } else{ %>
+                                <img id="avatar-img" src="http://localhost:9090/<%= user.avatar %>" alt="Avatar">
+                                <% } %>
+                    </div>
+                </span>
+                <span class="username"><%= user.Name %></span>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="/account/profile">
+                        <i class="fas fa-info-circle"></i> &nbsp;&nbsp;Cập nhật thông tin
+                    </a>
+                    <a class="dropdown-item" href="/account/logout">
+                        <i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp; Đăng xuất</a>
+                </div>
+                <div style="display: none;" id="user-id">
+                    <%= user.id %>
+                </div>
+            </div>
+
+    </header>
+    <div class="toolbar">
+        <ul class="tools">
+            <li class="compose">
+                <i class="fas fa-pen"></i> Compose
+            </li>
+            <li class="tool-items">
+                <i class="fas fa-inbox"></i>
+                <a href="/">Inbox</a>
+            </li>
+            <li class="tool-items">
+                <i class="fas fa-star"></i>
+                <a href="/starred">Starred</a>
+            </li>
+            <li class="tool-items">
+                <i class="fa-solid fa-paper-plane"></i>
+                <a href="/sent">Sent</a>
+            </li>
+            <li class="tool-items">
+                <i class="fa fa-pencil"></i>
+                <a href="/draft">Drafts</a>
+            </li>
+            <li class="tool-items">
+                <i class="fa fa-trash"></i>
+                <a href="/trash">Trash</a>
+            </li>
+
+            <li class="labels">
+                <span class="label" style="color: black;" role="heading">Labels</span>
+                <a href="#" id="add-label-button"><i class="fa fa-plus"></i></a>
+                <ul id="labels-list"> </ul>
+
+                <div id="add-label-popup">
+                    <form id="add-label-form">
+                        <label for="label-name">Label Name:</label>
+                        <input type="text" id="label-name" name="name">
+                        <input type="hidden" id="user-id" name="userId" value="1">
+                        <button type="submit">Add Label</button>
+                    </form>
+                </div>
+            </li>
+
+            <% if (user && user.role == 'admin') { %>
+                <li class="tool-items">
+                    <i class="fa-solid fa-gauge"></i>
+                    <a href="/dashboard">Dashboard</a>
+                </li>
+                <% } %>
+
+
+
+
+        </ul>
+    </div>
+
+    <div class="email-list">
+        <div class="toolbar-menu">
+            <ul class="tool-items">
+                <li>
+                    <input type="checkbox" id="mark-all" class="checkbox">
+                    <span>Mark all</span>
+                </li>
+                <li>
+                    <i class="fas fa-trash"></i>
+                    <span>Delete </span>
+                </li>
+                <li>
+                    <i class="far fa-envelope-open"></i>
+                    <span>Read</span>
+
+                </li>
+
+            </ul>
+        </div>
+
+
+        <ul>
+            <% emails.forEach(email => { %>
+                <li data-id="<%= email.id %>" class="email-item <%= (email.isRead) ? '' : 'email-unread' %>">
+                    <input title="Starred" type="checkbox" class="checkbox" />
+                    <% if (email.starred) { %>
+                        <i class="fa-solid fa-star" id="starred-mail"></i>
+                        <% } else { %>
+                            <i class="fa-regular fa-star" id="starred-mail"></i>
+                            <% } %>
+                                <span class="sender" value="<%= email.from %>"><% if (email.sender === user.Name) {%> me <%} else {%>
+                        <%= email.sender %>
+                        <%}%> </span>
+                                <span class="subject"><%= email.subject %></span>
+                                <span class="date"><%= email.sendAt.toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}).replace(/\//g, '-') %></span>
+                                <i title="Delete" class="fa-solid fa-trash" data-id="<%= email.id %>"></i>
+
+                                <!-- Meta-data -->
+                                <div class="email-meta fade-in-image">
+                                    <div class="avatar-info-meta">
+                                        <div class="avatar-meta">
+                                            <% if (!user.avatar) { %>
+                                                <img id="avatar-img" src="https://via.placeholder.com/100" alt="Avatar">
+                                                <% } else{ %>
+                                                    <img id="avatar-img" src="http://localhost:9090/<%= user.avatar %>" alt="Avatar">
+                                                    <% } %>
+                                        </div>
+                                        <div class="sender-inf">
+                                            <span class="sender-meta"><%= email.sender %></span>
+                                            <span class="email-sender-meta"><%= user.Email %></span>
+                                        </div>
+                                    </div>
+                                    <div class="tool-meta">
+                                        <button class="email-detail-meta">See the detail mail</button>
+                                        <i title="Delete" class="fa-solid fa-trash"></i>
+                                        <i title="New mail" class="fa-sharp fa-solid fa-envelope"></i>
+                                    </div>
+                                </div>
+                </li>
+                <% }) %>
+        </ul>
+    </div>
+
+
+    <div class="email-context-menu">
+        <ul>
+            <li>Add to label</li>
+            <li>Block mail</li>
+            <!-- Thêm các tùy chọn khác tại đây -->
+        </ul>
+    </div>
+
+
+    <div class="label-popup">
+        <ul>
+
+        </ul>
+    </div>
+    <!-- Compose mail -->
+    <form style="display: none;" class="compose-mail">
+        <div class="mail-header">
+            <p>New message</p>
+            <div class="control-btn">
+                <i class="fas fa-minus"></i>
+                <i class="fa-sharp fa-solid fa-up-right-and-down-left-from-center"></i>
+                <i id="close-message-btn" class="fas fa-x"></i>
+            </div>
+        </div>
+
+        <div class="mail-body">
+
+            <div class="receiver">
+                <span class="before-input">To:</span>
+                <input type="text" name="receiver" id="receiver" placeholder="Recipients">
+                <span id="cc-btn">Cc</span>,
+                <span id="bcc-btn">Bcc</span>
+            </div>
+
+            <div style="display: none;" class="cc">
+                <span class="before-input">Cc:</span>
+                <input type="text" name="cc" id="cc">
+            </div>
+
+            <div style="display: none;" class="bcc">
+                <span class="before-input">Bcc:</span>
+                <input type="text" name="bcc" id="bcc">
+            </div>
+
+            <div class="subject-mail">
+                <span class="before-input">Subject:</span>
+                <input type="text" name="subject" id="subject-mail">
+            </div>
+
+            <div class="mail-content"></div>
+
+        </div>
+
+        <div class="mail-footer">
+            <button id="send-mail">Send</button>
+        </div>
+    </form>
+
+
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    function showContextMenu(event) {
+        event.preventDefault();
+        let emailItem = event.target.closest('.email-item');
+
+        let $emailItem = $(emailItem);
+        let posX = event.clientX;
+        let posY = event.clientY;
+        let contextMenu = $('.email-context-menu');
+        contextMenu.css({
+            top: posY + 'px',
+            left: posX + 'px',
+            display: 'block'
+        });
+        contextMenu.on('click', 'li', function() {
+            if ($(this).text() === 'Add to label') {
+                $.ajax({
+                    url: '/get_labels',
+                    method: 'GET',
+                    success: function(data) {
+                        let labels = data;
+                        let tempLabels = [];
+                        let emailLabels = $emailItem.find('.label').toArray().map(function(label) {
+                            return $(label).text();
+                        });
+
+                        for (let i = 0; i < labels.length; i++) {
+                            let label = labels[i];
+                            if (!emailLabels.includes(label.name)) {
+                                tempLabels.push(label);
+                            }
+                        }
+
+                        let labelPopup = $('.label-popup');
+                        labelPopup.empty();
+
+                        for (let i = 0; i < tempLabels.length; i++) {
+                            let label = tempLabels[i];
+                            let item = $('<li>');
+                            let icon = $('<i>').addClass('fas fa-tag');
+                            let text = $('<span>').text(label.name);
+                            item.append(icon, text);
+                            labelPopup.append(item);
+                        }
+
+                        const popupTop = posY + 12;
+                        const popupLeft = posX + contextMenu.outerWidth() - 2;
+
+                        labelPopup.css({
+                            top: popupTop + 'px',
+                            left: popupLeft + 'px',
+                            display: 'block'
+                        });
+
+
+                        labelPopup.on('click', 'li', function() {
+                            let selectedLabel = $(this).text();
+                            console.log('Đã chọn nhãn:', selectedLabel);
+
+
+                            $.ajax({
+                                url: '/add_mail_to_label', // đường dẫn tới route trên server
+                                method: 'POST',
+                                data: {
+                                    mailId: $emailItem.attr('data-id'),
+                                    labelName: selectedLabel,
+                                },
+                                success: function(data) {
+
+                                },
+                                error: function(xhr, status, error) {
+
+                                    console.log(error);
+                                }
+                            });
+
+                            contextMenu.hide();
+                            labelPopup.hide();
+                            labelPopup.off('click', 'li');
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Lỗi khi lấy danh sách các nhãn!');
+                        console.log(error);
+                    }
+
+                });
+
+            } else if ($(this).text() === 'Block mail') {
+                let sender = emailItem.querySelector('.sender');
+                var blockedUser = sender.getAttribute('value');
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/check-blocked-users',
+                    data: {
+                        userA: 'username_A',
+                        userB: blockedUser
+                    },
+                    success: function(response) {
+                        if (response.status === 'both_blocked') {
+                            alert('You and ' + blockedUser + ' have already blocked each other. You cannot send or receive emails from this user.');
+                            contextMenu.hide();
+                        } else {
+                            $.ajax({
+                                type: 'POST',
+                                url: '/api/block-user',
+                                data: {
+                                    userA: '<%= user.Email %>',
+                                    userB: blockedUser
+                                },
+                                success: function(response) {
+
+                                    alert('You have blocked ' + blockedUser + '. You will no longer receive or send emails from this user.');
+
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '/api/delete-emails',
+                                        data: {
+                                            userA: '<%= user.Email %>',
+                                            userB: blockedUser
+                                        },
+                                        success: function(response) {
+
+                                        },
+                                        error: function() {
+                                            alert('An error occurred while deleting emails. Please try again later.');
+                                        }
+                                    });
+
+                                    emailItem.remove();
+                                    contextMenu.hide();
+                                },
+                                error: function() {
+                                    alert('An error occurred while blocking the user. Please try again later.');
+                                }
+                            });
+                        }
+                    },
+                    error: function() {
+                        alert('An error occurred while checking blocked users. Please try again later.');
+                    }
+                });
+            }
+        });
+    }
+    $('.email-item').on('click', function() {
+        $(this).removeClass('email-unread');
+    });
+    $('.email-item').on('contextmenu', showContextMenu);
+
+    //labels
+    const userId = $('#user-id').val();
+    $.get(`/labels?userId=${userId}`, labels => {
+        const labelsList = $('#labels-list');
+
+        labels.forEach(label => {
+            if (label.name) { // Kiểm tra xem trường name có tồn tại không
+                const item = $('<li>').html(`
+        <span class="label-name" data-id="${label.id}" > <i class="fa-solid fa-tag"></i>${label.name}</span>
+        <span class="label-menu" ><i class="fa fa-ellipsis-v"></i>
+          <ul class="menu-options">
+            <li class="menu-item edit-label" data-id="${label.id}">Edit Label</li>
+            <li class="menu-item delete-label" data-id="${label.id}">Delete Label</li>
+          </ul>
+        </span>
+      `);
+                labelsList.append(item);
+
+            }
+
+        });
+        labelsList.on('click', '.label-name', function() {
+            const labelId = $(this).data('id');
+            console.log(labelId);
+            $.ajax({
+                url: `/emails/${labelId}`,
+                type: 'GET',
+                success: function(data) {
+                    labelId: labelId;
+                    window.location.href = `/emails/${labelId}`;
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log(textStatus, errorThrown);
+                }
+            });
+        });
+
+
+    });
+
+
+    $('#add-label-button').click(function(event) {
+        event.preventDefault();
+
+        $('#add-label-popup').show();
+    });
+
+    $('#add-label-form').submit(function(event) {
+        event.preventDefault();
+
+        const formData = $(this).serialize();
+
+        $.post('/labels', formData, function(result) {
+            const item = $('<li>').text(result.name);
+            $('#labels-list').append(item);
+
+            $('#add-label-popup').hide();
+            $('#add-label-form')[0].reset();
+            window.location.reload();
+        });
+    });
+
+    $(document).ready(function() {
+        // Thêm sự kiện click vào phần tử label-menu
+        $(document).on('click', '.label-menu', function() {
+            $(this).find('.menu-options').toggle();
+        });
+
+        // Thêm sự kiện click vào phần tử edit-label
+        $(document).on('click', '.edit-label', function() {
+            const labelNameElem = $(this).closest('li').find('.label-name');
+            const labelName = labelNameElem.text();
+            let newLabelName = prompt('Enter new label name:', labelName);
+
+            while (newLabelName.trim() === '') {
+                newLabelName = prompt('Label name cannot be empty. Enter new label name:', labelName);
+                if (newLabelName === null) {
+                    return;
+                }
+            }
+            labelNameElem.text(newLabelName);
+
+            const id = $(this).data('id');
+            const data = {
+                name: newLabelName
+            };
+
+            $.ajax({
+                url: `/labels/${id}`,
+                type: 'PUT',
+                data: data,
+                success: function(result) {
+                    console.log(result);
+                    window.location.reload();
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            });
+        });
+        // Thêm sự kiện click vào phần tử delete-label
+        $(document).on('click', '.delete-label', function() {
+            const id = $(this).data('id');
+            console.log(id);
+            if (confirm('Are you sure you want to delete this label?')) {
+                $.ajax({
+                    url: '/labels/' + id,
+                    type: 'DELETE',
+                    success: function(result) {
+                        console.log(result);
+                        $(this).closest('li').remove();
+                        window.location.reload();
+                    },
+                    error: function(err) {
+                        console.log(err);
+                    }
+                });
+
+            }
+        });
+    });
+
+    $(document).ready(function() {
+        $('.star').click(function() {
+            $(this).toggleClass('starred');
+        });
+    });
+    $(document).ready(function() {
+        $(".dropdown-toggle").click(function() {
+            $(".dropdown-menu").toggle();
+        });
+    });
+    $(document).ready(function() {
+        $('#mark-all').click(function() {
+            var checkboxes = $('.checkbox');
+            var checked = checkboxes.prop('checked');
+            if (checkboxes.filter(':checked').length === checkboxes.length) {
+                checkboxes.prop('checked', false);
+                $(this).prop('checked', false);
+            } else {
+                checkboxes.prop('checked', true);
+                $(this).prop('checked', true);
+            }
+        });
+
+        $('.checkbox').click(function() {
+            var checkboxes = $('.checkbox');
+            var markAll = $('#mark-all');
+            if (checkboxes.filter(':checked').length === checkboxes.length) {
+                markAll.prop('checked', true);
+            } else {
+                markAll.prop('checked', false);
+            }
+        });
+    });
+
+    //Search-bar
+
+    $(document).ready(function() {
+        $('#search-btn').click(function() {
+            search();
+        });
+
+        $('#search-input').keypress(function(event) {
+            if (event.which === 13) {
+                search();
+            }
+        });
+
+        function search() {
+            var keyword = $('#search-input').val();
+            // check if it includes the 'from:' keyword
+            if (keyword.includes('from:')) {
+                // extract email address from the search query
+                var index = keyword.indexOf('from:') + 5;
+                var email = keyword.substring(index);
+                window.location.href = '/search?from=' + encodeURIComponent(email);
+            } else {
+                // search normally
+                window.location.href = '/search?keyword=' + encodeURIComponent(keyword);
+            }
+        }
+
+    });
+
+    //advanced-seach 
+
+    //advanced-seach 
+
+    const advancedSearchInput = document.getElementById("advanced-search-input");
+    const advancedSearchBtn = document.getElementById("advanced-search-btn");
+    const searchInput = document.getElementById("search-input");
+    advancedSearchBtn.addEventListener("click", function() {
+        advancedSearchInput.style.display = "block";
+        searchInput.placeholder = "Search Advanced";
+        searchInput.value = "";
+    });
+
+    searchInput.addEventListener("click", function() {
+        advancedSearchInput.style.display = "none";
+        searchInput.placeholder = "Search";
+
+    });
+
+    $(document).ready(function() {
+        $('#advanced-search-input-btn').click(function() {
+            var from = $('#from-input').val().trim();
+            var to = $('#to-input').val().trim();
+            var subject = $('#subject-input').val().trim();
+
+            $.ajax({
+                url: '/search',
+                method: 'GET',
+                data: {
+                    from: from,
+                    to: to,
+                    subject: subject
+                },
+                success: function(data) {
+                    window.location.href = "/search?from=" + encodeURIComponent(from) + "&to=" + encodeURIComponent(to) + "&subject=" + encodeURIComponent(subject);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+<script>
+    // WYSIWYG
+    tinymce.init({
+        selector: '.mail-content',
+        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+        tinycomments_mode: 'embedded',
+        images_upload_url: 'postAcceptor.php',
+        file_picker_types: 'file image media'
+    });
+
+    // Show compose mail UI
+    let ccbtn = document.querySelector('#cc-btn');
+    let bccbtn = document.querySelector('#bcc-btn');
+    let composeBtn = document.querySelector('.compose');
+    let cmpCloseBtn = document.querySelector('#close-message-btn');
+    let ccInput = document.querySelector('.cc');
+    let bccInput = document.querySelector('.bcc');
+    let cmpMail = document.querySelector('.compose-mail');
+
+
+    ccbtn.addEventListener('click', () => {
+        if (!ccInput.hasAttribute('style')) {
+            ccInput.setAttribute('style', 'display:none');
+        } else {
+            ccInput.removeAttribute('style');
+        }
+    });
+
+    bccbtn.addEventListener('click', () => {
+        if (!bccInput.hasAttribute('style')) {
+            bccInput.setAttribute('style', 'display: none');
+        } else {
+            bccInput.removeAttribute('style');
+        }
+    });
+
+    composeBtn.addEventListener('click', () => {
+        cmpMail.removeAttribute('style');
+    });
+
+    cmpCloseBtn.addEventListener('click', e => {
+        e.stopImmediatePropagation();
+        const userEmail = document.querySelector('.avatar-inf.dropdown-toggle').getAttribute('data');
+        const userName = document.querySelector('.username').innerHTML;
+        const receiverInput = document.querySelector('#receiver');
+        const receiver = receiverInput.value.trim();
+
+        const ccInput = document.querySelector('#cc');
+        const cc = ccInput.value.trim();
+
+        const bccInput = document.querySelector('#bcc');
+        const bcc = bccInput.value.trim();
+
+        const subject = document.querySelector('#subject-mail').value;
+        const content = tinymce.activeEditor.getContent();
+
+        const mailData = {
+            sender: userName,
+            from: userEmail,
+            to: receiver || '',
+            cc: cc || '',
+            bcc: bcc || '',
+            subject,
+            content,
+            sendAt: new Date(),
+            starred: false,
+            isRead: false,
+        }
+
+        if (mailData.to || mailData.bcc || mailData.cc || mailData.subject || mailData.content) {
+            localStorage.setItem("draft", JSON.stringify(mailData));
+            let data = localStorage.getItem('draft');
+
+            fetch('/draft', {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: data
+                })
+                .then(() => {
+                    cmpMail.setAttribute('style', 'display: none');
+                })
+                .catch(err => console.log(err))
+        }
+        cmpMail.setAttribute('style', 'display: none');
+    });
+
+    //Compose for icon in meta-data
+    let newEmails = document.querySelectorAll('.email-meta .tool-meta .fa-envelope')
+    newEmails.forEach(newMail => {
+        newMail.addEventListener('click', e => {
+            e.stopImmediatePropagation();
+            document.querySelector('#receiver').value = document.querySelector('.sender-inf .email-sender-meta').innerHTML
+            cmpMail.removeAttribute('style');
+        })
+    })
+
+    //See detail in meta
+    let detailMails = document.querySelectorAll('.email-meta .tool-meta .email-detail-meta')
+    detailMails.forEach(detail => {
+        detail.addEventListener('click', e => {
+            e.stopImmediatePropagation();
+            const emailId = detail.parentElement.parentElement.parentElement.dataset.id;
+            window.location.href = `/email-detail/${emailId}`;
+        })
+    })
+
+    //Close and minimize compose mail UI
+    const minimizeBtn = document.querySelector('.fa-minus');
+    const newMsg = document.querySelector('.compose-mail > .mail-header > div');
+    const restoreBtn = document.querySelector('.fa-sharp.fa-solid.fa-up-right-and-down-left-from-center');
+
+    minimizeBtn.addEventListener('click', () => {
+        cmpMail.style.position = 'fixed';
+        cmpMail.style.bottom = '0';
+        cmpMail.style.right = '0';
+        cmpMail.style.width = '200px';
+        cmpMail.style.height = '40px';
+        cmpMail.style.borderRadius = '10px';
+        newMsg.style.display = 'block';
+    });
+
+    restoreBtn.addEventListener('click', () => {
+        cmpMail.style.position = '';
+        cmpMail.style.bottom = '';
+        cmpMail.style.right = '';
+        cmpMail.style.width = '';
+        cmpMail.style.height = '';
+        cmpMail.style.borderRadius = '';
+        newMsg.style.display = '';
+    });
+
+    //Delete a mail (store to trash db)
+    const trashIcons = document.querySelectorAll('.fa-trash');
+    trashIcons.forEach(icon => {
+        icon.addEventListener('click', e => {
+            e.stopImmediatePropagation();
+            const emailId = e.target.dataset.id;
+            fetch(`/get-email/${emailId}`)
+                .then(res => res.json())
+                .then(data => {
+                    fetch(`/trash`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                sender: data.from,
+                                receiver: data.to,
+                                ...data
+                            })
+                        })
+                        .then(() => {
+                            fetch(`/${emailId}`, {
+                                    method: 'DELETE'
+                                })
+                                .then(res => console.log(res))
+                                .catch(e => console.log(e))
+
+                            icon.parentElement.remove()
+                        })
+                        .catch(err => console.log(err))
+                })
+        });
+
+    });
+</script>
+
+<script>
+    const socket = io();
+    socket.on('connect', () => {
+        console.log("Connected");
+    });
+
+    //Starred the mail
+    const starredMail = document.querySelectorAll('.email-list #starred-mail')
+    starredMail.forEach(starred => {
+        starred.addEventListener('click', e => {
+            e.stopImmediatePropagation();
+            const emailId = e.target.parentElement.dataset.id;
+
+            if (starred.classList.contains('fa-regular')) {
+                fetch(`/starred/${emailId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            starred: true
+                        })
+                    })
+                    .then(res => {
+                        starred.classList.remove('fa-regular');
+                        starred.classList.add('fa-solid');
+                    })
+                    .catch(e => console.log(e))
+            } else {
+                fetch(`/starred/${emailId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            starred: false
+                        })
+                    })
+                    .then(res => {
+                        starred.classList.remove('fa-solid');
+                        starred.classList.add('fa-regular');
+                    })
+                    .catch(e => console.log(e))
+
+            }
+        });
+    })
+
+    //Check the mail is read already
+    const emailItems = document.querySelectorAll('.email-item');
+    emailItems.forEach(item => {
+        item.addEventListener('click', e => {
+            e.stopImmediatePropagation();
+            const emailId = e.target.dataset.id;
+            if (emailId) {
+                fetch(`/isRead/${emailId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            isRead: true
+                        })
+                    })
+                    .then(res => item.classList.remove('email-unread'))
+                    .then(() => {
+                        window.location.href = `/email-detail/${emailId}`;
+                    })
+                    .catch(err => console.log(err))
+            }
+        })
+    })
+
+
+
+    function getMailData() {
+        const avtInf = document.querySelector('.avatar-inf.dropdown-toggle');
+        const userEmail = avtInf.getAttribute('data');
+        const userName = document.querySelector('.username').innerHTML;
+
+        const receiverInput = document.querySelector('#receiver');
+        const receiver = receiverInput.value.trim();
+        if (!validateEmail(receiver)) {
+            alert('Invalid email address');
+            receiverInput.focus();
+            return;
+        }
+
+        const ccInput = document.querySelector('#cc');
+        const cc = ccInput.value.trim();
+        if (cc && !validateEmail(cc)) {
+            alert('Invalid email address');
+            ccInput.focus();
+            return;
+        }
+
+        const bccInput = document.querySelector('#bcc');
+        const bcc = bccInput.value.trim();
+        if (bcc && !validateEmail(bcc)) {
+            alert('Invalid email address');
+            bccInput.focus();
+            return;
+        }
+
+        const subject = document.querySelector('#subject-mail').value;
+        const content = tinymce.activeEditor.getContent();
+
+        const mailData = {
+            sender: userName,
+            from: userEmail,
+            to: receiver,
+            cc,
+            bcc,
+            subject,
+            content,
+            sendAt: new Date(),
+            starred: false,
+            isRead: false,
+        };
+        return mailData
+    }
+
+
+    //Send mail
+    const submitMailForm = document.querySelector('.compose-mail');
+    submitMailForm.addEventListener('submit', e => {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+
+        const mailData = getMailData();
+        const sender = mailData.from;
+        const recipient = mailData.to;
+
+        // Gọi endpoint để kiểm tra xem hai người dùng có bị chặn lẫn nhau hay không
+        const url = `/api/check-blocked?sender=${sender}&recipient=${recipient}`;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const isBlocked = data.isBlocked;
+
+                // Kiểm tra xem email có được gửi từ người dùng bị chặn hay không
+                if (isBlocked) {
+                    // Ngăn người dùng gửi email
+                    alert('You cannot email this user because you have blocked or blocked by the recipient.');
+                    return;
+                }
+
+                // Gửi email
+                socket.emit('send-email', mailData);
+                localStorage.removeItem("draft");
+                submitMailForm.setAttribute('style', 'display: none');
+                submitMailForm.reset();
+            })
+            .catch(error => {
+                console.error(error);
+                alert('There was an error checking if the users are blocked.');
+            });
+    });
+
+
+    socket.on('email-sent', (message) => {
+        alert(message);
+    });
+
+    socket.on('email-error', (message) => {
+        alert(message);
+    });
+
+
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+</script>
+
+</html>

@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdn.tiny.cloud/1/4lb731z2dfw15m1oaipj6yvcaf47ygrtqs5dlustsxkrt9u1/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<head>
+    <title>Gmail Web App</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Poppins:wght@400;500;600&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('http://localhost:9090/backgroud.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+        
+        .activate {
+            display: flex;
+            align-items: center;
+        }
+        
+        .activate button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .account {
+            display: flex;
+            align-items: center;
+        }
+        
+        .account img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .account span {
+            font-size: 14px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .logo img {
+            width: auto;
+            height: 120px;
+            margin-left: 30px;
+        }
+        
+        header {
+            background-color: #fff;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px #ccc;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 12%;
+            z-index: 1;
+        }
+        
+        .toolbar {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #888;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 10px;
+            margin-top: 25px;
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 200px;
+            height: calc(100% - 70px);
+            box-shadow: 2px 0 5px #ccc;
+            z-index: 1;
+        }
+        
+        .email-list {
+            margin-top: 94px;
+            margin-left: 205px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px #ccc;
+            position: relative;
+        }
+        
+        .toolbar-menu button {
+            margin-left: 10px;
+        }
+        
+        .toolbar-menu .tool-items i {
+            margin-right: 10px;
+        }
+        
+        .toolbar ul {
+            list-style: none;
+            margin-left: 10px;
+            justify-content: center;
+            padding: 0;
+        }
+        
+        .toolbar li {
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .toolbar li.active {
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .toolbar li:hover {
+            color: #333;
+        }
+        
+        .toolbar a {
+            color: black;
+        }
+        
+        .email-list ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .email-list li {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            cursor: pointer;
+        }
+        
+        .email-list li:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .email-list li .checkbox {
+            margin-right: 10px;
+        }
+        
+        .email-list li .sender {
+            flex: 1;
+            margin-right: 10px;
+            font-weight: bold;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        
+        .email-list li .subject {
+            flex: 3;
+            margin-right: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        
+        .email-list li .date {
+            flex: 1;
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .email-view {
+            max-width: 1000px;
+            margin: 80px auto 0 220px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px #ccc;
+            border-radius: 5px;
+        }
+        
+        .email-view h2 {
+            margin-bottom: 10px;
+        }
+        
+        .email-view .details {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .email-view .details .sender {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .email-view .details .date {
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .email-view p {
+            line-height: 1.5;
+        }
+        
+        .status-inf {
+            margin-left: auto;
+            margin-right: 20px;
+            border: 1px solid #ccc;
+            border-radius: 999px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        
+        .status-inf span {
+            margin-left: 10px;
+        }
+        
+        .avatar-inf {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 999px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        
+        .dropdown .icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            margin-right: 5px;
+            background-color: #ec407a;
+            border-radius: 50%;
+            font-size: 25px;
+            color: #fff;
+        }
+        
+        .compose {
+            width: fit-content;
+            padding: 20px;
+            border-radius: 10px;
+            border: 0;
+            background-color: #c2e7ff;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        
+        .compose:hover {
+            box-shadow: 0 0 5px 5px #ccc;
+        }
+        
+        .compose i {
+            margin-right: 10px;
+        }
+        
+        .search-btn {
+            min-width: 100px;
+            padding: 10px;
+            border: 0;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #c2e7ff;
+        }
+        
+        .toolbar-menu {
+            background: white;
+        }
+        
+        .toolbar-menu .tool-items {
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .toolbar-menu .tool-items li {
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .toolbar-menu .tool-items i {
+            margin-right: 10px;
+        }
+        
+        .toolbar-menu .tool-items span {
+            margin-left: 10px;
+        }
+        
+        .icon .avatar-preview {
+            display: inline-block;
+            width: 50px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        
+        .icon .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        /* Modal meta-data */
+        
+        .email-item {
+            position: relative;
+        }
+        
+        .email-item input[type='checkbox']:hover {
+            box-shadow: 0 0 5px 5px #ccc;
+            cursor: pointer;
+        }
+        
+        .email-item:hover>span {
+            pointer-events: none;
+        }
+        
+        .compose-mail {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 800px;
+            height: 600px;
+            background-color: #fff;
+            box-shadow: 0 0 5px 5px #ccc;
+            border-radius: 10px;
+        }
+        
+        .mail-header {
+            display: flex;
+            padding: 10px 10px 0 10px;
+            background-color: #eee;
+            border-top-left-radius: 10px;
+        }
+        
+        .mail-header .control-btn {
+            margin-left: auto;
+            cursor: pointer;
+        }
+        
+        .mail-header i {
+            padding: 5px;
+            font-size: 14px;
+        }
+        
+        .mail-body {
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+            margin: 0 10px;
+        }
+        
+        .mail-body input {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            width: 100%;
+        }
+        
+        .mail-body .receiver,
+        .mail-body .cc,
+        .mail-body .bcc,
+        .mail-body .subject-mail {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mail-body span.before-input {
+            min-width: 55px;
+        }
+        
+        #cc-btn:hover,
+        #bcc-btn:hover {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        #inbox {
+            background: #ccc;
+        }
+        
+        .tool-items .number-of-mail {
+            margin-left: auto;
+            border-radius: 50%;
+            padding: 5px;
+            font-weight: bold;
+            font-size: 10px;
+        }
+        
+        .toolbar .active-page {
+            background-color: #ccc;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        
+        #send-mail {
+            width: 200px;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 999px;
+            border: 0;
+            background-color: blue;
+            color: #fff;
+            font-weight: bold;
+        }
+        /* If mail is not read (used in inbox)*/
+        
+        .email-unread {
+            font-weight: bold;
+            color: #333;
+            background-color: #ddd;
+        }
+        /*search-bar*/
+        
+        .search-bar {
+            display: flex;
+            align-items: center;
+            margin-left: 60px;
+            position: relative;
+        }
+        
+        .search-input-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .search-input-container input[type="text"] {
+            width: 100%;
+            padding: 10px 450px 10px 10px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 10px;
+            background-color: #f2f2f2;
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box;
+        }
+        
+        .search-input-container button {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            border: none;
+            background-color: transparent;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .advanced-search-btn {
+            min-width: 100px;
+            padding: 10px;
+            border: 0;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #c2e7ff;
+        }
+        
+        .advanced-search-input {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 79%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            font-size: 16px;
+            color: #333;
+            z-index: 999;
+        }
+        
+        .advanced-search-input label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .advanced-search-input input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: #f2f2f2;
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box;
+            justify-content: center;
+        }
+        
+        .advanced-search-input select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: #f2f2f2;
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box;
+            justify-content: center;
+        }
+        
+        #starred-mail {
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        span .sender {
+            min-width: 400px;
+        }
+        /* Modal meta */
+        /* .email-meta {
+            display: none;
+            position: absolute;
+            top: 40px;
+            left: 80px;
+            width: 300px;
+            height: 150px;
+            font-size: 14px;
+            background-color: #acd0f4;
+            border-radius: 0 10px;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .email-item:hover .email-meta {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+        }
+
+        .email-meta .avatar-info-meta {
+            padding: 10px;
+            display: flex;
+            flex: 5;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .email-meta .avatar-info-meta .avatar-meta img {
+            flex: 1;
+            display: flex;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .email-meta .avatar-info-meta .sender-inf {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            margin-left: 10px;
+        }
+
+        .email-meta .tool-meta {
+            flex: 1;
+            margin: 5px;
+            border-top: 1px solid #fff;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .email-meta .tool-meta i {
+            margin-left: 10px;
+            margin-top: 5px;
+        }
+
+        .email-meta .tool-meta i:hover {
+            text-shadow: 0 0 10px #fff;
+        }
+
+        .email-meta .tool-meta .email-detail-meta {
+            margin-right: auto;
+            border: 0;
+            padding: 2px;
+            margin-top: 5px;
+            border-radius: 10px;
+        }
+
+        .email-meta .tool-meta .email-detail-meta:hover {
+            box-shadow: 0 0 2px 2px #ddd;
+        } */
+        
+        .email-detail {
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            position: absolute;
+            background-color: #ffffff;
+            width: 84.5%;
+            left: 220px;
+            top: 100px;
+            bottom: 10px;
+            overflow: auto;
+        }
+        
+        .email-detail button[class^="btn-"] {
+            padding: 10px;
+            width: 150px;
+            margin: 10px;
+            border: 0.5px solid #ccc;
+            border-radius: 9999px;
+        }
+        
+        .email-detail button[class^="btn-"]:hover {
+            background-color: #ccc;
+            box-shadow: 0 0 3px #ddd;
+        }
+        
+        .email-detail button[class^="btn-"] i {
+            margin-right: 20px;
+        }
+        
+        .email-detail .heading {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #000;
+            margin-bottom: 20px;
+        }
+        
+        .email-detail .heading .subject-detail {
+            margin-right: auto;
+        }
+        
+        .email-detail .info {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        .email-detail .info div {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .email-detail .date-email-detail {
+            display: flex;
+            margin-left: auto;
+        }
+        
+        .content-of-mail {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            box-shadow: 5px 5px 10px #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <a href="http://localhost:9090/">
+
+                <img src="http://localhost:9090/logo.png">
+            </a>
+        </div>
+        <div class="search-bar">
+            <div class="search-input-container">
+                <input type="text" id="search-input" placeholder="Search...">
+                <button id="search-btn" class="search-btn"><i class="fa fa-search"></i></button>
+            </div>
+            <button id="advanced-search-btn" class="advanced-search-btn">Advanced Search</button>
+            <div id="advanced-search-input" class="advanced-search-input">
+                <div class="form-group">
+                    <label for="from-input">From:</label>
+                    <input type="text" id="from-input" name="from">
+                </div>
+                <div class="form-group">
+                    <label for="to-input">To:</label>
+                    <input type="text" id="to-input" name="to">
+                </div>
+                <div class="form-group">
+                    <label for="subject-input">Subject:</label>
+                    <input type="text" id="subject-input" name="subject">
+                </div>
+                <div class="form-group">
+                    <label for="date-within-input">Date within:</label>
+                    <select id="date-within-input" name="date-within">
+                        <option value="1d">1 day</option>
+                        <option value="1w">1 week</option>
+                        <option value="1m">1 month</option>
+                        <option value="3m">3 months</option>
+                        <option value="6m">6 months</option>
+                        <option value="1y">1 year</option>
+                    </select>
+                </div>
+                <button class='advanced-search-input-btn' type="submit">Search</button>
+            </div>
+        </div>
+
+
+        <div class="status-inf">
+            <i class="fa fa-solid fa-circle" style="color: green;"></i>
+            <span class="status">Active</span>
+        </div>
+
+        <div class="dropdown text-right">
+            <div class="avatar-inf dropdown-toggle text-primary" data-toggle="dropdown" data="<%= user.Email %>">
+                <span class="icon">
+                    <div class="avatar-preview">
+                        <% if (!user.avatar) { %>
+                            <img id="avatar-img" src="https://via.placeholder.com/100" alt="Avatar">
+                            <% } else{ %>
+                                <img id="avatar-img" src="http://localhost:9090/<%= user.avatar %>" alt="Avatar">
+                                <% } %>
+                    </div>
+                </span>
+                <span class="username"><%= user.Name %></span>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="/account/profile">
+                        <i class="fas fa-info-circle"></i> &nbsp;&nbsp;Cập nhật thông tin
+                    </a>
+                    <a class="dropdown-item" href="/account/logout">
+                        <i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp; Đăng xuất</a>
+                </div>
+
+            </div>
+
+    </header>
+    <div class="toolbar">
+        <ul class="tools">
+            <li class="compose">
+                <i class="fas fa-pen"></i> Compose
+            </li>
+            <li class="tool-items">
+                <i class="fas fa-inbox"></i>
+                <a href="/">Inbox</a>
+            </li>
+            <li class="tool-items">
+                <i class="fas fa-star"></i>
+                <a href="/starred">Starred</a>
+            </li>
+            <li class="tool-items">
+                <i class="fa-solid fa-paper-plane"></i>
+                <a href="/sent">Sent</a>
+            </li>
+            <li class="tool-items">
+                <i class="fa fa-clock-o"></i>
+                <a href="/snoozed">Snoozed</a>
+            </li>
+            <li class="tool-items">
+                <i class="fa fa-pencil"></i>
+                <a href="/draft">Drafts</a>
+            </li>
+
+        </ul>
+    </div>
+
+    <div data-id="<%= email.id %>" class="email-detail">
+        <div class="heading">
+            <h2 class="subject-detail">
+                <%= email.subject %>
+            </h2>
+            <% if (email.starred) { %>
+                <i class="fa-solid fa-star" id="starred-mail"></i>
+                <% } else { %>
+                    <i class="fa-regular fa-star" id="starred-mail"></i>
+                    <% } %>
+        </div>
+
+        <div class="info">
+            <div>
+                <p>From:
+                    <%= email.sender %> &lt;
+                        <%= email.from %>&gt;</p>
+                <p>To:
+                    <%= email.to %>
+                </p>
+            </div>
+            <p class="date-email-detail">
+                <%=  email.sendAt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' }) %> (
+                    <%= getTimeDiff(email.sendAt) %>)</p>
+        </div>
+
+        <div contenteditable="false" class="content-mail content-of-mail">
+            <%- email.content %>
+        </div>
+
+        <div class="replies"></div>
+
+        <div class="btn-tool">
+            <button class="btn-reply">
+                <i class="fa-solid fa-reply"></i>
+                Reply
+            </button>
+            <button class="btn-forward">
+                <i class="fa-solid fa-share"></i>
+                Forward
+            </button>
+        </div>
+
+        <div class="reply-section"></div>
+        <div class="forward-section"></div>
+    </div>
+
+    <!-- Compose mail -->
+    <form style="display: none;" class="compose-mail">
+        <div class="mail-header">
+            <p>New message</p>
+            <div class="control-btn">
+                <i class="fas fa-minus"></i>
+                <i class="fa-sharp fa-solid fa-up-right-and-down-left-from-center"></i>
+                <i id="close-message-btn" class="fas fa-x"></i>
+            </div>
+        </div>
+
+        <div class="mail-body">
+
+            <div class="receiver">
+                <span class="before-input">To:</span>
+                <input type="text" name="receiver" id="receiver" placeholder="Recipients">
+                <span id="cc-btn">Cc</span>,
+                <span id="bcc-btn">Bcc</span>
+            </div>
+
+            <div style="display: none;" class="cc">
+                <span class="before-input">Cc:</span>
+                <input type="text" name="cc" id="cc">
+            </div>
+
+            <div style="display: none;" class="bcc">
+                <span class="before-input">Bcc:</span>
+                <input type="text" name="bcc" id="bcc">
+            </div>
+
+            <div class="subject-mail">
+                <span class="before-input">Subject:</span>
+                <input type="text" name="subject" id="subject-mail">
+            </div>
+
+            <div class="mail-content"></div>
+
+        </div>
+
+        <div class="mail-footer">
+            <button id="send-mail">Send</button>
+        </div>
+    </form>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.star').click(function(e) {
+            e.stopImmediatePropagation();
+            $(this).toggleClass('starred');
+        });
+    });
+    $(document).ready(function() {
+        $(".dropdown-toggle").click(function() {
+            $(".dropdown-menu").toggle();
+        });
+    });
+    $(document).ready(function() {
+        $('#mark-all').click(function(e) {
+            e.stopImmediatePropagation();
+            var checkboxes = $('.checkbox');
+            var checked = checkboxes.prop('checked');
+            if (checkboxes.filter(':checked').length === checkboxes.length) {
+                checkboxes.prop('checked', false);
+                $(this).prop('checked', false);
+            } else {
+                checkboxes.prop('checked', true);
+                $(this).prop('checked', true);
+            }
+        });
+
+        $('.checkbox').click(function(e) {
+            e.stopImmediatePropagation();
+            var checkboxes = $('.checkbox');
+            var markAll = $('#mark-all');
+            if (checkboxes.filter(':checked').length === checkboxes.length) {
+                markAll.prop('checked', true);
+            } else {
+                markAll.prop('checked', false);
+            }
+        });
+    });
+
+    //Search-bar
+
+    $(document).ready(function() {
+        $('#search-btn').click(function() {
+            search();
+        });
+
+        $('#search-input').keypress(function(event) {
+            if (event.which === 13) {
+                search();
+            }
+        });
+
+        function search() {
+            var keyword = $('#search-input').val();
+            // check if it includes the 'from:' keyword
+            if (keyword.includes('from:')) {
+                // extract email address from the search query
+                var index = keyword.indexOf('from:') + 5;
+                var email = keyword.substring(index);
+                window.location.href = '/search?from=' + encodeURIComponent(email);
+            } else {
+                // search normally
+                window.location.href = '/search?keyword=' + encodeURIComponent(keyword);
+            }
+        }
+
+    });
+
+    //advanced-seach 
+
+    const advancedSearchInput = document.getElementById("advanced-search-input");
+    const advancedSearchBtn = document.getElementById("advanced-search-btn");
+    const searchInput = document.getElementById("search-input");
+    advancedSearchBtn.addEventListener("click", function() {
+        advancedSearchInput.style.display = "block";
+        searchInput.placeholder = "Search Advanced";
+        searchInput.value = "";
+    });
+
+    searchInput.addEventListener("click", function() {
+        advancedSearchInput.style.display = "none";
+        searchInput.placeholder = "Search";
+
+    });
+
+    $(document).ready(function() {
+        $('#advanced-search-input-btn').click(function() {
+            var from = $('#from-input').val().trim();
+            var to = $('#to-input').val().trim();
+            var subject = $('#subject-input').val().trim();
+
+            $.ajax({
+                url: '/search',
+                method: 'GET',
+                data: {
+                    from: from,
+                    to: to,
+                    subject: subject
+                },
+                success: function(data) {
+                    window.location.href = "/search?from=" + encodeURIComponent(from) + "&to=" + encodeURIComponent(to) + "&subject=" + encodeURIComponent(subject);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+<script>
+    // WYSIWYG
+    tinymce.init({
+        selector: '.mail-content',
+        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+        tinycomments_mode: 'embedded'
+    });
+
+    window.onload = e => {
+        let subjectData = document.querySelector('.subject-detail').innerHTML.trim()
+        e.stopImmediatePropagation();
+
+        fetch(`/reply/${subjectData}`, {
+                method: 'GET'
+            })
+            .then(res => res.json())
+            .then(data => {
+                const rplies = document.querySelector('.replies');
+                data.reply.forEach(rp => {
+                    const html = `
+                    <div class="content-of-mail reply-render">
+                        <div class="reply-subject">RE: <%= email.subject %></div>
+                        <div class="replier">from: you</div>
+                        <div class="receive-replier">to: <%= email.sender %> &lt;<%= email.from %>&gt;</div>
+                        <div class="reply-content">${rp.content}</div>
+                    </div>
+                    `;
+                    rplies.innerHTML += html;
+                })
+            })
+            .catch(err => console.log(err))
+    }
+
+    // Show compose mail UI
+    let ccbtn = document.querySelector('#cc-btn');
+    let bccbtn = document.querySelector('#bcc-btn');
+    let composeBtn = document.querySelector('.compose');
+    let cmpCloseBtn = document.querySelector('#close-message-btn');
+    let ccInput = document.querySelector('.cc');
+    let bccInput = document.querySelector('.bcc');
+    let cmpMail = document.querySelector('.compose-mail');
+
+
+    ccbtn.addEventListener('click', () => {
+        if (!ccInput.hasAttribute('style')) {
+            ccInput.setAttribute('style', 'display:none');
+        } else {
+            ccInput.removeAttribute('style');
+        }
+    });
+
+    bccbtn.addEventListener('click', () => {
+        if (!bccInput.hasAttribute('style')) {
+            bccInput.setAttribute('style', 'display: none');
+        } else {
+            bccInput.removeAttribute('style');
+        }
+    });
+
+    composeBtn.addEventListener('click', () => {
+        cmpMail.removeAttribute('style');
+    });
+
+    cmpCloseBtn.addEventListener('click', () => {
+        cmpMail.setAttribute('style', 'display: none');
+    });
+
+    //Close and minimize compose mail UI
+    const minimizeBtn = document.querySelector('.fa-minus');
+    const newMsg = document.querySelector('.compose-mail > .mail-header > div');
+    const restoreBtn = document.querySelector('.fa-sharp.fa-solid.fa-up-right-and-down-left-from-center');
+
+    minimizeBtn.addEventListener('click', () => {
+        cmpMail.style.position = 'fixed';
+        cmpMail.style.bottom = '0';
+        cmpMail.style.right = '0';
+        cmpMail.style.width = '200px';
+        cmpMail.style.height = '40px';
+        cmpMail.style.borderRadius = '10px';
+        newMsg.style.display = 'block';
+    });
+
+    restoreBtn.addEventListener('click', () => {
+        cmpMail.style.position = '';
+        cmpMail.style.bottom = '';
+        cmpMail.style.right = '';
+        cmpMail.style.width = '';
+        cmpMail.style.height = '';
+        cmpMail.style.borderRadius = '';
+        newMsg.style.display = '';
+    });
+</script>
+
+<script>
+    const socket = io();
+    socket.on('connect', () => {
+        console.log("Connected");
+    });
+
+    //Delete a mail (even in database)
+    const trashIcons = document.querySelectorAll('.fa-trash');
+    trashIcons.forEach(icon => {
+        icon.addEventListener('click', async(e) => {
+            e.stopImmediatePropagation()
+            let isConfirmed = confirm('Do you really want to delete this mail?')
+            if (isConfirmed) {
+                const emailId = e.target.parentNode.dataset.id;
+                fetch(`/${emailId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(res => console.log(res))
+                    .catch(e => console.log(e))
+
+                icon.parentElement.remove()
+            }
+        });
+    });
+
+    //Starred the mail
+    const starredMail = document.querySelectorAll('.email-detail #starred-mail')
+    starredMail.forEach(starred => {
+        starred.addEventListener('click', e => {
+            e.stopImmediatePropagation();
+            const emailId = starred.parentElement.parentElement.dataset.id;
+
+            if (starred.classList.contains('fa-regular')) {
+                fetch(`/starred/${emailId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            starred: true
+                        })
+                    })
+                    .then(res => {
+                        starred.classList.remove('fa-regular');
+                        starred.classList.add('fa-solid');
+                    })
+                    .catch(err => consolrr.log(err))
+            } else {
+                fetch(`/starred/${emailId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            starred: false
+                        })
+                    })
+                    .then(res => {
+                        starred.classList.remove('fa-solid');
+                        starred.classList.add('fa-regular');
+                    })
+                    .catch(err => console.log(err))
+
+            }
+        });
+    })
+
+    //Check the mail is read already
+    const emailItems = document.querySelectorAll('li.email-item');
+    emailItems.forEach(item => {
+        item.addEventListener('click', e => {
+            e.stopImmediatePropagation();
+            const emailId = e.target.dataset.id;
+            fetch(`/isRead/${emailId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        isRead: true
+                    })
+                })
+                .then(res => item.classList.remove('email-unread'))
+                .catch(e => console.log(e))
+
+            fetch(`/email-detal/${emailId}`, {
+                    method: 'GET'
+                })
+                .then(res => console.log(res))
+                .catch(e => console.log(e))
+        })
+    })
+
+    //Send mail
+    const submitMailForm = document.querySelector('.compose-mail');
+
+    function sendMailForm(submitMailForm) {
+        submitMailForm.addEventListener('submit', e => {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            const avtInf = document.querySelector('.avatar-inf.dropdown-toggle');
+            const userEmail = avtInf.getAttribute('data');
+            const userName = document.querySelector('.username').innerHTML;
+
+            const receiverInput = document.querySelector('#receiver');
+            const receiver = receiverInput.value.trim();
+            if (!validateEmail(receiver)) {
+                alert('Invalid email address');
+                receiverInput.focus();
+                return;
+            }
+
+            const ccInput = document.querySelector('#cc');
+            const cc = ccInput.value.trim();
+            if (cc && !validateEmail(cc)) {
+                alert('Invalid email address');
+                ccInput.focus();
+                return;
+            }
+
+            const bccInput = document.querySelector('#bcc');
+            const bcc = bccInput.value.trim();
+            if (bcc && !validateEmail(bcc)) {
+                alert('Invalid email address');
+                bccInput.focus();
+                return;
+            }
+
+            const subject = document.querySelector('#subject-mail').value;
+            const content = tinymce.activeEditor.getContent();
+
+            const mailData = {
+                sender: userName,
+                from: userEmail,
+                to: receiver,
+                cc,
+                bcc,
+                subject,
+                content,
+                sendAt: new Date(),
+                starred: false,
+                isRead: false,
+            };
+
+            socket.emit('send-email', mailData);
+
+            submitMailForm.setAttribute('style', 'display: none');
+            submitMailForm.reset();
+        });
+    }
+    //Reply the mail
+    sendMailForm(submitMailForm);
+
+    const btnReply = document.querySelector('.btn-tool .btn-reply');
+    btnReply.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        const form = document.createElement('form');
+        form.classList.add('compose-mail');
+
+        form.innerHTML = `
+            <p style="padding: 10px">Reply to: <%= email.subject %></p>
+            <div class="mail-body">
+                <div class="receiver">
+                    <span class="before-input">To:</span>
+                    <input type="text" name="receiver" id="receiver" placeholder="Recipients" value="<%= email.from %>" disabled>
+                    <span id="cc-btn">Cc</span>,
+                    <span id="bcc-btn">Bcc</span>
+                </div>
+
+                <div style="display: none;" class="cc">
+                    <span class="before-input">Cc:</span>
+                    <input type="text" name="cc" id="cc">
+                </div>
+
+                <div style="display: none;" class="bcc">
+                    <span class="before-input">Bcc:</span>
+                    <input type="text" name="bcc" id="bcc">
+                </div>
+
+                <div class="subject-mail">
+                    <span class="before-input">Subject:</span>
+                    <input type="text" name="subject" id="subject-mail" value="RE:<%= email.subject %>" disabled>
+                </div>
+
+                <div class="mail-content">
+                    <textarea id="mail-content"></textarea>    
+                </div>
+
+            </div>
+
+            <div class="mail-footer">
+            <button type="submit" id="send-mail">Send</button>
+            </div>
+        `;
+
+        const replySection = document.querySelector('.reply-section');
+        replySection.appendChild(form);
+
+        form.style.display = 'block';
+        tinymce.init({
+            selector: '#mail-content',
+            height: 350,
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            tinycomments_mode: 'embedded',
+            autoresize: true
+        });
+
+        const submitMailForm = document.querySelector('.compose-mail');
+        sendMailForm(submitMailForm);
+
+        let subjectData = document.querySelector('.subject-detail').innerHTML.trim()
+        document.querySelector('#send-mail').addEventListener('click', e => {
+            e.stopImmediatePropagation();
+
+            fetch(`/reply/${subjectData}`, {
+                    method: 'GET'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    const rplies = document.querySelector('.replies');
+                    data.reply.forEach(rp => {
+                        const html = `
+                    <div class="content-of-mail reply-render">
+                        <div class="reply-subject">RE: <%= email.subject %></div>
+                        <div class="replier">from: you</div>
+                        <div class="receive-replier">to: <%= email.sender %> &lt;<%= email.from %>&gt;</div>
+                        <div class="reply-content">${rp.content}</div>
+                    </div>
+                    `;
+                        rplies.innerHTML += html;
+                    })
+                })
+                .catch(err => console.log(err))
+        })
+    });
+
+    const btnForward = document.querySelector('.btn-tool .btn-forward')
+    btnForward.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        const form = document.createElement('form');
+        form.classList.add('compose-mail');
+
+        form.innerHTML = `
+            <p style="padding: 10px">Forward from: <%= email.from %> </p>
+            <div class="mail-body">
+            <div class="receiver">
+                <span class="before-input">To:</span>
+                <input type="text" name="receiver" id="receiver" placeholder="Recipients" required>
+                <span id="cc-btn">Cc</span>,
+                <span id="bcc-btn">Bcc</span>
+            </div>
+
+            <div style="display: none;" class="cc">
+                <span class="before-input">Cc:</span>
+                <input type="text" name="cc" id="cc">
+            </div>
+
+            <div style="display: none;" class="bcc">
+                <span class="before-input">Bcc:</span>
+                <input type="text" name="bcc" id="bcc">
+            </div>
+
+            <div class="subject-mail">
+                <span class="before-input">Subject:</span>
+                <input type="text" name="subject" id="subject-mail" value="<%= email.subject %>">
+            </div>
+
+            <div class="mail-content"> <%- email.content %> </div>
+
+            </div>
+
+            <div class="mail-footer">
+            <button id="send-mail">Send</button>
+            </div>
+        `;
+
+        const forwardSection = document.querySelector('.forward-section');
+        forwardSection.appendChild(form);
+        tinymce.init({
+            selector: '.mail-content',
+            height: 350,
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            tinycomments_mode: 'embedded'
+        });
+        form.style.display = 'block';
+
+        let receiver = document.querySelector('#receiver').value || '';
+        const submitMailForm = document.querySelector('.compose-mail');
+        sendMailForm(submitMailForm);
+    })
+
+    socket.on('email-sent', (message) => {
+        alert(message);
+    });
+
+    socket.on('email-error', (message) => {
+        alert(message);
+    });
+
+
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+</script>
+
+</html>

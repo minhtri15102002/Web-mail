@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.tiny.cloud/1/4lb731z2dfw15m1oaipj6yvcaf47ygrtqs5dlustsxkrt9u1/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <title>Admin panel</title>
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Poppins:wght@400;500;600&display=swap');
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+    }
+    
+    body {
+        margin: 0;
+        padding: 0;
+        background-image: url('http://localhost:9090/backgroud.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        overflow: hidden;
+    }
+    
+    .fa,
+    .fas {
+        color: #858585;
+    }
+    
+    .fa-folder {
+        color: rgb(74, 158, 255);
+    }
+    
+    i.fa,
+    table i.fas {
+        font-size: 16px;
+        margin-right: 6px;
+    }
+    
+    i.action {
+        cursor: pointer;
+    }
+    
+    a {
+        color: black;
+    }
+    
+    .search-bar {
+        flex: 1;
+        margin: auto;
+    }
+    
+    .search-bar input[type="text"] {
+        margin-left: 50px;
+        width: 75%;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        box-shadow: 0 0 5px #ccc;
+    }
+    
+    .activate {
+        display: flex;
+        align-items: center;
+    }
+    
+    .activate button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        margin-right: 10px;
+        cursor: pointer;
+    }
+    
+    .status-inf {
+        margin-left: auto;
+        margin-right: 20px;
+        border: 1px solid #ccc;
+        border-radius: 999px;
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+    
+    .status-inf span {
+        margin-left: 10px;
+    }
+    
+    .avatar-inf {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ccc;
+        border-radius: 999px;
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+    
+    .logo img {
+        width: auto;
+        height: 120px;
+        margin-left: 30px;
+    }
+    
+    header {
+        background-color: #fff;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 5px #ccc;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 12%;
+        z-index: 1;
+    }
+    
+    .dropdown .icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 40px;
+        height: 40px;
+        margin-right: 5px;
+        border-radius: 50%;
+        font-size: 25px;
+        color: #fff;
+    }
+    
+    .search-btn {
+        min-width: 100px;
+        padding: 10px;
+        border: 0;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #c2e7ff;
+    }
+    
+    .container {
+        display: flex;
+        flex-direction: row;
+        max-width: 1200px;
+        margin-top: 100px;
+        padding: 20px;
+    }
+    
+    .left-menu {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 25%;
+        background-color: #ffffff;
+        padding: 20px;
+        margin-right: 20px;
+        border-radius: 10px;
+    }
+    
+    .left-menu img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 20px;
+        cursor: pointer;
+    }
+    
+    .left-menu ul {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        padding: 0;
+    }
+    
+    .left-menu ul li {
+        margin-bottom: 10px;
+    }
+    
+    .left-menu ul li a {
+        color: #333;
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: bold;
+        transition: color 0.3s;
+    }
+    
+    .left-menu ul li a:hover {
+        color: #666;
+    }
+    
+    .right-content {
+        display: flex;
+        flex-direction: column;
+        width: 75%;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+    }
+    
+    .right-content h2 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        font-weight: bold;
+    }
+    
+    .right-content form {
+        display: flex;
+        flex-direction: column;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .right-content label {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    
+    .right-content .name-group {
+        width: 170%;
+    }
+    
+    .right-content .name-group input[type="text"] {
+        margin-right: 20px;
+        width: 48%;
+    }
+    
+    .right-content .contact-group {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    
+    .right-content .contact-group input[type="email"],
+    .right-content .contact-group input[type="tel"] {
+        margin-left: 10px;
+        margin-right: 19px;
+        width: 48%;
+    }
+    
+    .right-content input[type="text"],
+    .right-content input[type="email"],
+    .right-content input[type="tel"] {
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+    
+    .right-content button {
+        background-color: #333;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    .right-content button:hover {
+        background-color: #666;
+    }
+    
+    .avatar-group {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        margin-left: 0px;
+        margin-bottom: 20px;
+    }
+    /* Thêm lớp CSS cho ô vuông tròn avatar */
+    
+    .avatar-preview {
+        width: 100px;
+        height: 100px;
+        overflow: hidden;
+        border-radius: 50%;
+    }
+    
+    .avatar-input {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        opacity: 0;
+        z-index: 1;
+        /* giá trị z-index là số dương */
+        width: 100%;
+        height: 100%;
+    }
+    
+    .avatar-preview img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+    
+    .save-btn {
+        margin-top: 30px;
+    }
+    
+    .icon {
+        display: inline-block;
+        width: 50px;
+        height: 40px;
+    }
+    
+    .icon .avatar-preview {
+        display: inline-block;
+        width: 50px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+    
+    .icon .avatar-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    /*search-bar*/
+    
+    .search-bar {
+        display: flex;
+        align-items: center;
+        margin-left: 60px;
+        position: relative;
+    }
+    
+    .search-input-container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .search-input-container input[type="text"] {
+        width: 100%;
+        padding: 10px 450px 10px 10px;
+        margin-right: 10px;
+        border: none;
+        border-radius: 10px;
+        background-color: #f2f2f2;
+        font-size: 16px;
+        color: #333;
+        box-sizing: border-box;
+    }
+    
+    .search-input-container button {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        border: none;
+        background-color: transparent;
+        color: #333;
+        font-size: 16px;
+    }
+    
+    .advanced-search-btn {
+        min-width: 100px;
+        padding: 10px;
+        border: 0;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #c2e7ff;
+    }
+    
+    .advanced-search-input {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 79%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        font-size: 16px;
+        color: #333;
+        z-index: 999;
+    }
+    
+    .advanced-search-input label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    .advanced-search-input input[type="text"] {
+        width: 100%;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        background-color: #f2f2f2;
+        font-size: 16px;
+        color: #333;
+        box-sizing: border-box;
+        justify-content: center;
+    }
+    
+    .advanced-search-input select {
+        width: 100%;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        background-color: #f2f2f2;
+        font-size: 16px;
+        color: #333;
+        box-sizing: border-box;
+        justify-content: center;
+    }
+    /* main */
+    
+    .sidebar {
+        position: fixed;
+        top: 60px;
+        width: 260px;
+        height: calc(100% - 60px);
+        background: #299B63;
+        overflow-x: hidden;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        z-index: 2;
+    }
+    
+    .sidebar ul {
+        margin-top: 20px;
+    }
+    
+    .sidebar ul li {
+        width: 100%;
+        list-style: none;
+    }
+    
+    .sidebar ul li:hover {
+        background: #fff;
+    }
+    
+    .sidebar ul li:hover a {
+        color: #299B63;
+    }
+    
+    .sidebar ul li a {
+        width: 100%;
+        text-decoration: none;
+        color: #fff;
+        height: 60px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .sidebar ul li a i {
+        min-width: 60px;
+        font-size: 24px;
+        text-align: center;
+    }
+    /* main */
+    
+    .main {
+        position: absolute;
+        top: 60px;
+        width: calc(100% - 260px);
+        min-height: calc(100vh - 60px);
+        left: 260px;
+        background: #f5f5f5;
+    }
+    
+    .cards {
+        width: 100%;
+        padding: 35px 20px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-gap: 20px;
+    }
+    
+    .cards .card {
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+    }
+    
+    .number {
+        font-size: 35px;
+        font-weight: 500;
+        color: #299B63;
+    }
+    
+    .card-name {
+        color: #888;
+        font-weight: 600;
+    }
+    
+    .icon-box i {
+        font-size: 45px;
+        color: #299b63;
+    }
+    /* charts */
+    
+    .charts {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        grid-gap: 20px;
+        width: 100%;
+        padding: 20px;
+        padding-top: 0;
+    }
+    
+    .chart {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+        width: 100%;
+    }
+    
+    .chart h2 {
+        margin-bottom: 5px;
+        font-size: 20px;
+        color: #666;
+        text-align: center
+    }
+    
+    @media (max-width:1115px) {
+        .sidebar {
+            width: 60px;
+        }
+        .main {
+            width: calc(100% - 60px);
+            left: 60px;
+        }
+    }
+    
+    @media (max-width:880px) {
+        /* .topbar {
+        grid-template-columns: 1.6fr 6fr 0.4fr 1fr;
+    } */
+        .fa-bell {
+            justify-self: left;
+        }
+        .cards {
+            width: 100%;
+            padding: 35px 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-gap: 20px;
+        }
+        .charts {
+            grid-template-columns: 1fr;
+        }
+        .doughnut-chart {
+            padding: 50px;
+        }
+        #doughnut {
+            padding: 50px;
+        }
+    }
+    
+    @media (max-width:500px) {
+        .topbar {
+            grid-template-columns: 1fr 5fr 0.4fr 1fr;
+        }
+        .logo h2 {
+            font-size: 20px;
+        }
+        .search {
+            width: 80%;
+        }
+        .search input {
+            padding: 0 20px;
+        }
+        .fa-bell {
+            margin-right: 5px;
+        }
+        .cards {
+            grid-template-columns: 1fr;
+        }
+        .doughnut-chart {
+            padding: 10px;
+        }
+        #doughnut {
+            padding: 0px;
+        }
+        .user {
+            width: 40px;
+            height: 40px;
+        }
+    }
+    /*search-bar*/
+    
+    .search-bar {
+        display: flex;
+        align-items: center;
+        margin-left: 60px;
+        position: relative;
+    }
+    
+    .search-input-container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .search-input-container input[type="text"] {
+        width: 100%;
+        padding: 10px 450px 10px 10px;
+        margin-right: 10px;
+        border: none;
+        border-radius: 10px;
+        background-color: #f2f2f2;
+        font-size: 16px;
+        color: #333;
+        box-sizing: border-box;
+    }
+    
+    .search-input-container button {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        border: none;
+        background-color: transparent;
+        color: #333;
+        font-size: 16px;
+    }
+    
+    .advanced-search-btn {
+        min-width: 100px;
+        padding: 10px;
+        border: 0;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #c2e7ff;
+    }
+    
+    .advanced-search-input {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 79%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        font-size: 16px;
+        color: #333;
+        z-index: 999;
+    }
+    
+    .advanced-search-input label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    .advanced-search-input input[type="text"] {
+        width: 100%;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        background-color: #f2f2f2;
+        font-size: 16px;
+        color: #333;
+        box-sizing: border-box;
+        justify-content: center;
+    }
+    
+    .advanced-search-input select {
+        width: 100%;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        background-color: #f2f2f2;
+        font-size: 16px;
+        color: #333;
+        box-sizing: border-box;
+        justify-content: center;
+    }
+    
+    .toolbar {
+        background-color: rgba(255, 255, 255, 0.8);
+        color: #888;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 10px;
+        margin-top: 25px;
+        position: fixed;
+        border-top: rgba(255, 255, 255, 0);
+        top: 65px;
+        left: 0;
+        width: 260px;
+        height: calc(100% - 70px);
+        box-shadow: 2px 0 5px #ccc;
+        z-index: 1;
+    }
+    
+    .toolbar-menu button {
+        margin-left: 10px;
+    }
+    
+    .toolbar-menu .tool-items i {
+        margin-right: 10px;
+    }
+    
+    .toolbar ul {
+        list-style: none;
+        margin-left: 10px;
+        justify-content: center;
+        padding: 0;
+    }
+    
+    .toolbar li {
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
+    
+    .toolbar li.active {
+        color: #333;
+        font-weight: bold;
+    }
+    
+    .toolbar li:hover {
+        color: #333;
+    }
+    
+    .toolbar a {
+        color: black;
+    }
+    
+    .toolbar-menu {
+        background: white;
+    }
+    
+    .toolbar-menu .tool-items {
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .toolbar-menu .tool-items li {
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .toolbar-menu .tool-items i {
+        margin-right: 10px;
+    }
+    
+    .toolbar-menu .tool-items span {
+        margin-left: 10px;
+    }
+    
+    .tool-items .number-of-mail {
+        margin-left: auto;
+        border-radius: 50%;
+        padding: 5px;
+        font-weight: bold;
+        font-size: 10px;
+    }
+    
+    .toolbar .active-page {
+        background-color: #ccc;
+        padding: 10px;
+        border-radius: 10px;
+    }
+    
+    .compose {
+        width: fit-content;
+        padding: 20px;
+        border-radius: 10px;
+        border: 0;
+        background-color: #c2e7ff;
+        margin-bottom: 20px;
+        cursor: pointer;
+    }
+    
+    .compose:hover {
+        box-shadow: 0 0 5px 5px #ccc;
+    }
+    
+    .compose i {
+        margin-right: 10px;
+    }
+</style>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <a href="http://localhost:9090/">
+
+                <img src="http://localhost:9090/logo.png">
+            </a>
+        </div>
+        <div class="search-bar">
+            <div class="search-input-container">
+                <input type="text" id="search-input" placeholder="Search...">
+                <button id="search-btn" class="search-btn"><i class="fa fa-search"></i></button>
+            </div>
+            <button id="advanced-search-btn" class="advanced-search-btn">Advanced Search</button>
+            <div id="advanced-search-input" class="advanced-search-input">
+                <div class="form-group">
+                    <label for="from-input">From:</label>
+                    <input type="text" id="from-input" name="from">
+                </div>
+                <div class="form-group">
+                    <label for="to-input">To:</label>
+                    <input type="text" id="to-input" name="to">
+                </div>
+                <div class="form-group">
+                    <label for="subject-input">Subject:</label>
+                    <input type="text" id="subject-input" name="subject">
+                </div>
+                <div class="form-group">
+                    <label for="date-within-input">Date within:</label>
+                    <select id="date-within-input" name="date-within">
+                        <option value="1d">1 day</option>
+                        <option value="1w">1 week</option>
+                        <option value="1m">1 month</option>
+                        <option value="3m">3 months</option>
+                        <option value="6m">6 months</option>
+                        <option value="1y">1 year</option>
+                    </select>
+                </div>
+                <button class='advanced-search-input-btn' type="submit">Search</button>
+            </div>
+        </div>
+
+
+        <div class="status-inf">
+            <i class="fa fa-solid fa-circle" style="color: green;"></i>
+            <span class="status">Active</span>
+        </div>
+
+        <div class="dropdown text-right">
+            <div class="avatar-inf dropdown-toggle text-primary" data-toggle="dropdown" data="<%= user.Email %>">
+                <span class="icon">
+                    <div class="avatar-preview">
+                        <% if (!user.avatar) { %>
+                            <img id="avatar-img" src="https://via.placeholder.com/100" alt="Avatar">
+                            <% } else{ %>
+                                <img id="avatar-img" src="http://localhost:9090/<%= user.avatar %>" alt="Avatar">
+                                <% } %>
+                    </div>
+                </span>
+                <span class="username"><%= user.Name %></span>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="/account/profile">
+                        <i class="fas fa-info-circle"></i> &nbsp;&nbsp;Cập nhật thông tin
+                    </a>
+                    <a class="dropdown-item" href="/account/logout">
+                        <i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp; Đăng xuất</a>
+                </div>
+                <div style="display: none;" id="user-id">
+                    <%= user.id %>
+                </div>
+            </div>
+
+    </header>
+    <div class="toolbar">
+        <ul class="tools">
+            <li class="compose">
+                <i class="fas fa-pen"></i> Compose
+            </li>
+
+            <li class="tool-items">
+                <i class="fas fa-inbox"></i>
+                <a href="/">Inbox</a>
+            </li>
+            <li class="tool-items">
+                <i class="fas fa-star"></i>
+                <a href="/starred">Starred</a>
+            </li>
+            <li class="tool-items">
+                <i class="fa-solid fa-paper-plane"></i>
+                <a href="/sent">Sent</a>
+            </li>
+            <li class="tool-items">
+                <i class="fa fa-pencil"></i>
+                <a href="/draft">Drafts</a>
+            </li>
+            <li class="tool-items">
+                <i class="fa fa-trash"></i>
+                <a href="/trash">Trash</a>
+            </li>
+
+            <li class="labels">
+                <span class="label" style="color: black;" role="heading">Labels</span>
+                <a href="#" id="add-label-button"><i class="fa fa-plus"></i></a>
+                <ul id="labels-list"> </ul>
+
+
+            </li>
+
+
+
+
+        </ul>
+    </div>
+    <div class="container">
+        <div class="main">
+            <div class="cards">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="number">
+                            <%= emailCount %>
+                        </div>
+                        <div class="card-name">Mail</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="number">30</div>
+                        <div class="card-name">Inbox</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="number">42</div>
+                        <div class="card-name">Outbox</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="number">
+                            <%= userCount %>
+                        </div>
+                        <div class="card-name">Account</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="charts">
+                <div class="chart">
+                    <h2>Mail</h2>
+                    <div>
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart doughnut-chart">
+                    <h2>Employees</h2>
+                    <div>
+                        <canvas id="doughnut"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+    <script>
+        var ctx = document.getElementById('lineChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Mail: ',
+                    data: [100, 110, 120, 130, 140, 100, 30, 50, 60, 80, 160, 130],
+                    backgroundColor: [
+                        'rgba(85,85,85, 1)'
+
+                    ],
+                    borderColor: 'rgb(41, 155, 99)',
+
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
+    <script>
+        const user = '<%= userCount %>';
+        const mail = '<%= emailCount %>';
+        const totalStorage = '<%= totalStorage %>';
+        const unreadCount = '<%= unreadCount %>';
+        const trashCount = '<%= trashCount %>';
+        const labelCount = '<%= labelCount %>';
+        const blockedUsers = '<%= blockedUsers %>';
+        const draftCount = '<%= draftCount %>';
+        var ctx2 = document.getElementById('doughnut').getContext('2d');
+        var myChart2 = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['User', 'Mail', 'Activate Account', 'Unread Mail', 'Trash Mail', 'Blocked Users', 'Draft Mail', 'Others'],
+                datasets: [{
+                    label: 'Employees',
+                    data: [user, mail, totalStorage, unreadCount, trashCount, blockedUsers, draftCount, 10],
+                    backgroundColor: [
+                        'rgba(41, 155, 99, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(120, 46, 139, 1)',
+                        'rgba(0, 128, 128, 1)',
+                        'rgba(176, 48, 96, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(193, 240, 13, 0.8)'
+
+                    ],
+                    borderColor: [
+                        'rgba(41, 155, 99, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(120, 46, 139, 1)',
+                        'rgba(0, 128, 128, 1)',
+                        'rgba(176, 48, 96, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(193, 240, 13, 0.8)'
+
+                    ],
+                    borderWidth: 1
+                }]
+
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
+
+    <<script src="https://code.jquery.com/jquery-3.6.0.min.js "></script>
+        <script>
+            $(document).ready(function() {
+                $(".dropdown-toggle ").click(function() {
+                    $(".dropdown-menu ").toggle();
+                });
+            });
+            // Xử lý sự kiện khi người dùng chọn hình ảnh và hiển thị hình ảnh được chọn trong phần xem trước của avatar
+
+
+
+            $(document).ready(function() {
+                // Xử lý khi người dùng chọn file ảnh mới
+                $('#avatar').on('change', function() {
+                    var formData = new FormData();
+                    formData.append('avatar', $('#avatar')[0].files[0]);
+
+                    // Gửi AJAX request để upload ảnh mới
+                    $.ajax({
+                        url: '/account/upload-avatar',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(data) {
+                            // Cập nhật ảnh mới trên preview
+                            $('#avatar-img').attr('src', data.imageUrl);
+                            window.location.reload();
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.log('Error uploading image: ' + errorThrown);
+                        }
+                    });
+                });
+            });
+
+            $("#avatar-img").on("click", function() {
+                $("#avatar").click();
+            });
+
+            $(document).ready(function() {
+                $('.save-btn').click(function() {
+                    const firstName = $('#first-name').val();
+                    const phone = $('#phone').val();
+
+                    $.post('/account/profile', {
+                        'first-name': firstName,
+                        'phone': phone
+                    }, function(data, status) {
+                        console.log('Response status: ' + status);
+                    });
+                });
+            });
+
+
+            $(document).ready(function() {
+                $('#search-btn').click(function() {
+                    search();
+                });
+
+                $('#search-input').keypress(function(event) {
+                    if (event.which === 13) {
+                        search();
+                    }
+                });
+
+                function search() {
+                    var keyword = $('#search-input').val();
+                    // check if it includes the 'from:' keyword
+                    if (keyword.includes('from:')) {
+                        // extract email address from the search query
+                        var index = keyword.indexOf('from:') + 5;
+                        var email = keyword.substring(index);
+                        window.location.href = '/search?from=' + encodeURIComponent(email);
+                    } else {
+                        // search normally
+                        window.location.href = '/search?keyword=' + encodeURIComponent(keyword);
+                    }
+                }
+
+            });
+
+            //advanced-seach 
+
+            const advancedSearchInput = document.getElementById("advanced-search-input");
+            const advancedSearchBtn = document.getElementById("advanced-search-btn");
+            const searchInput = document.getElementById("search-input");
+            advancedSearchBtn.addEventListener("click", function() {
+                advancedSearchInput.style.display = "block";
+                searchInput.placeholder = "Search Advanced";
+                searchInput.value = "";
+            });
+
+            searchInput.addEventListener("click", function() {
+                advancedSearchInput.style.display = "none";
+                searchInput.placeholder = "Search";
+
+            });
+
+            $(document).ready(function() {
+                $('#advanced-search-input-btn').click(function() {
+                    var from = $('#from-input').val().trim();
+                    var to = $('#to-input').val().trim();
+                    var subject = $('#subject-input').val().trim();
+
+                    $.ajax({
+                        url: '/search',
+                        method: 'GET',
+                        data: {
+                            from: from,
+                            to: to,
+                            subject: subject
+                        },
+                        success: function(data) {
+                            window.location.href = "/search?from=" + encodeURIComponent(from) + "&to=" + encodeURIComponent(to) + "&subject=" + encodeURIComponent(subject);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(error);
+                        }
+                    });
+                });
+            });
+        </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Kích hoạt tài khoản</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-image: url('http://localhost:9090/backgroud.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        overflow: hidden;
+    }
+</style>
+
+<body>
+
+
+    <div class="row">
+        <div class="col-md-6 mt-5 mx-auto p-3 border rounded">
+            <form method="POST">
+
+                <h4>Đặt lại mật khẩu tài khoản</h4>
+                <div class="form-group">
+                    <label for="pass">New Password</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+            <i class="fas fa-lock"></i>
+      </span>
+                        </div>
+                        <input type="password" name="password" class="form-control" placeholder="Password">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="pass">Confirm Password</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+        <i class="fas fa-lock"></i>
+      </span>
+                        </div>
+                        <input type="password" name="confirmPassword" class="form-control" placeholder="Password">
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <% if(error.length > 0){ %>
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <%= error %>
+                        </div>
+                        <% } %>
+                </div>
+                <button type="submit" class="btn btn-primary">Verify</button>
+            </form>
+        </div>
+    </div>
+
+
+
+
+
+</body>
+
+
+</html>

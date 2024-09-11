@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Kích hoạt tài khoản</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-image: url('http://localhost:9090/backgroud.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        overflow: hidden;
+    }
+</style>
+
+<body>
+
+
+    <div class="row">
+        <div class="col-md-6 mt-5 mx-auto p-3 border rounded">
+            <form method="POST">
+
+                <h4>Xác minh tài khoản</h4>
+                <div class="form-group">
+                    <label for="user">Phone Number</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                          <i class="fas fa-phone"></i>
+                        </span>
+                        </div>
+                        <input value="<%=phone%>" id="phone-input" name="phone" type="text" class="form-control" placeholder="Your phone number">
+                        <div class="input-group-append">
+                            <button id="send-otp-btn" type="button" class="btn btn-primary">Send</button>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="otp">Verification code:</label>
+                    <input value="<%=otp%>" id="otp" name="otp" type="text" class="form-control" placeholder="Your OTP Number" required>
+                </div>
+                <div class="form-group">
+                    <% if(error.length > 0){ %>
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <%= error %>
+                        </div>
+                        <% } %>
+                </div>
+                <button type="submit" class="btn btn-primary">Verify</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        $(function() {
+            $('#send-otp-btn').click(function(e) {
+                e.preventDefault();
+
+                var phone = $('#phone-input').val(); // Lấy giá trị số điện thoại được nhập từ ô input
+
+                if (phone.trim().length == 0) { // Kiểm tra xem có nhập hay không
+                    alert('Vui lòng nhập số điện thoại');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/account/send-verification-code', // Đường link để send request tới backend
+                    method: 'POST',
+                    data: {
+                        phoneNumber: phone // Truyền số điện thoại vào POST data
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        alert('Mã OTP đã được gửi tới số điện thoại của bạn. Vui lòng kiểm tra và nhập mã để tiếp tục')
+                    },
+                    error: function(err) {
+                        console.error(err);
+                        alert('Có lỗi xảy ra khi gửi mã OTP')
+                    }
+                })
+            })
+        });
+    </script>
+
+
+</body>
+
+
+</html>
